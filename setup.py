@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dln2",
-    version="0.2.0",
+    version="0.1.0",
     description="Unified DLN2 driver — SPI, GPIO, I2C, ADC over a single USB connection. "
                 "Originally developed for the Pico USB I/O Board.",
     long_description=open("README.md").read(),
