@@ -339,10 +339,10 @@ def spi_test():
 
     try:
         print("Opening SpiDev (DLN backend)...")
-        dev.open(0, 0)
         dev.max_speed_hz = 1_000_000
         dev.mode = 0
         dev.bits_per_word = 8
+        dev.open(0, 0)
         tx = [0x9F, 0x00, 0x00, 0x00]
         print("Sending JEDEC (0x9F) via DLN wrapper... host_hold_cs=", dev.host_hold_cs)
         rx = dev.xfer2(tx)
@@ -359,23 +359,22 @@ def spi_test():
 
 
 def bpw_test():
-    """Cycle SPI bits-per-word 4..16 sending a test pattern at each setting."""
+    """Cycle SPI bits-per-word 8 and 16 sending a test pattern at each setting."""
     from dln2.spi import SpiDev
 
-    print("Sending one transfer for each BPW 4..16")
+    print("Sending one transfer for BPW 8 and 16")
     try:
         with SpiDev() as dev:
-            dev.open(0, 0)
             dev.max_speed_hz = 1_000_000
             dev.mode = 0
 
-            for bpw in range(4, 17):
+            for bpw in (8, 16):
                 dev.bits_per_word = bpw
+                dev.open(0, 0)
 
-                if bpw <= 8:
-                    pattern = 0xAA & ((1 << bpw) - 1)
-                else:
-                    pattern = 0xAAAA & ((1 << bpw) - 1)
+                mask = (1 << bpw) - 1
+                pattern = 0xAA if bpw <= 8 else 0xAAAA
+                pattern &= mask
 
                 try:
                     rx = dev.xfer2([pattern])
@@ -383,7 +382,8 @@ def bpw_test():
                 except Exception as e:
                     print(f"bpw={bpw:2d}  tx={pattern:#06x}  FAILED: {e}")
 
-                time.sleep(0.1)
+                dev.close()
+                time.sleep(0.2)
 
             print("Done.")
     except RuntimeError as e:

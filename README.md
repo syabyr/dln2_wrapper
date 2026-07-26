@@ -152,6 +152,27 @@ python3 examples/adc_info.py
 | Multi-device | Manual USB enumeration | `list_devices()` |
 | Cross-module data flow | Impossible (4 echo counters) | Trivial (same counter) |
 
+## Pin Constraints
+
+| Pins | Capability |
+|---|---|
+| 0–22, 26–28 | Full GPIO (input/output + events) |
+| 23, 24, 29 | Output-only (reserved for SMPS / VBUS / VSYS) |
+| 25 | Output-only (on-board LED) |
+| ADC 0–2 | Map to GPIO 26, 27, 28 respectively |
+
+## Firmware Compatibility
+
+| dln2 Python | Minimum firmware | Notes |
+|---|---|---|
+| 0.2.1 | [pico-usb-io-board](https://github.com/syabyr/pico-usb-io-board) `>= v0.2` | SPI bpw validation, ADC pin-sharing fix |
+| 0.2.0 | any | Works with all firmware versions |
+
+To flash updated firmware:
+1. Hold the BOOTSEL button while connecting the Pico (or press and release RESET while holding BOOTSEL)
+2. Copy `dln2.uf2` to the `RPI-RP2` USB drive that appears
+3. The Pico reboots automatically with the new firmware
+
 ## Related
 
 - [pico-usb-io-board](https://github.com/syabyr/pico-usb-io-board) — RP2040 firmware

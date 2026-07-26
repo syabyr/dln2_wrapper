@@ -127,18 +127,25 @@ class Dln2Connection:
         self._setup()
 
     def _setup(self):
-        # Reset USB to clear stale state
-        try:
-            self._dev.reset()
-        except Exception:
-            pass
+        # NOTE: Do NOT call self._dev.reset() here.
+        # A USB bus reset only resets the USB peripheral on the RP2040 —
+        # SPI PIO/DMA state machines survive it. Commands that hit a
+        # half-configured PIO cause a hard fault that kills the firmware
+        # and requires a physical replug. Instead, just set configuration.
 
         try:
             self._dev.set_configuration()
         except Exception:
             pass
 
-        cfg = self._dev.get_active_configuration()
+        try:
+            cfg = self._dev.get_active_configuration()
+        except Exception:
+            raise RuntimeError(
+                "DLN2 device is not responding — "
+                "the Pico firmware may have crashed.\n"
+                "Please replug the USB cable to power-cycle the board."
+            )
         intf = cfg[(0, 0)]
 
         ep_out = ep_in = None

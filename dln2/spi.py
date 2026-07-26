@@ -46,14 +46,33 @@ class SpiDev:
 
     @bits_per_word.setter
     def bits_per_word(self, v):
-        self._bits_per_word = int(v)
+        v = int(v)
+        # RP2040 PIO SPI only reliably supports 8 and 16 bit frames.
+        # Other values (4-7, 9-15) can trigger firmware DMA/PIO bugs.
+        if v not in (8, 16):
+            raise ValueError(
+                f"bits_per_word must be 8 or 16, got {v}. "
+                f"The Pico firmware does not support other frame sizes."
+            )
+        self._bits_per_word = v
 
     def open(self, bus=0, device=0):
-        """No-op — connection already open. For spidev compatibility."""
+        """Enable the SPI module. For spidev compatibility."""
+        self._conn.spi_enable()
+        self._configure()
         return self
 
     def close(self):
-        pass  # connection is shared, caller manages _conn.close()
+        """Disable the SPI module so the firmware releases its PIO/DMA state."""
+        try:
+            self._conn.spi_disable()
+        except Exception:
+            pass
+
+    def _configure(self):
+        """Sync current settings to the hardware."""
+        self._conn.spi_configure(self._mode, self._max_speed_hz,
+                                  self._bits_per_word)
 
     def xfer2(self, data):
         """Full-duplex transfer. Returns MISO data."""
