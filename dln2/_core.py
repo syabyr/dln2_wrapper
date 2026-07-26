@@ -416,6 +416,7 @@ class Dln2Connection:
         return resp
 
     def i2c_read(self, addr, length, mem_addr_len=0, mem_addr=0):
+        # Use 9-byte header — firmware expects BBBIH for reads
         payload = struct.pack("<BBBIH", 0, int(addr) & 0x7F,
                               int(mem_addr_len) & 0xFF,
                               int(mem_addr) & 0xFFFFFFFF,

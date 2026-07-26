@@ -103,24 +103,28 @@ class SMBus:
         return self._require().i2c_read(addr, 1)[0]
 
     def read_byte_data(self, addr, cmd):
-        return self._require().i2c_read(addr, 1, mem_addr_len=1,
-                                        mem_addr=cmd)[0]
+        conn = self._require()
+        conn.i2c_write(addr, [cmd])
+        return conn.i2c_read(addr, 1)[0]
 
     def read_word_data(self, addr, cmd):
-        rx = self._require().i2c_read(addr, 2, mem_addr_len=1, mem_addr=cmd)
+        conn = self._require()
+        conn.i2c_write(addr, [cmd])
+        rx = conn.i2c_read(addr, 2)
         return rx[0] | (rx[1] << 8)
 
     def read_block_data(self, addr, cmd):
-        # Read count byte first, then data
-        count = self._require().i2c_read(addr, 1, mem_addr_len=1,
-                                         mem_addr=cmd)[0]
+        conn = self._require()
+        conn.i2c_write(addr, [cmd])
+        count = conn.i2c_read(addr, 1)[0]
         if count == 0:
             return []
-        return list(self._require().i2c_read(addr, count))
+        return list(conn.i2c_read(addr, count))
 
     def read_i2c_block_data(self, addr, cmd, length=32):
-        return list(self._require().i2c_read(addr, length,
-                                             mem_addr_len=1, mem_addr=cmd))
+        conn = self._require()
+        conn.i2c_write(addr, [cmd])
+        return list(conn.i2c_read(addr, length))
 
     # ── Raw access ─────────────────────────────────────
 
