@@ -14,7 +14,7 @@ setup(
     author="IPM Group",
     author_email="contact@ipmgroup.dev",
     license="MIT",
-    packages=find_packages(exclude=["examples", "i2c", "i2c.*"]),
+    packages=find_packages(exclude=["examples"]),
     package_data={"dln2": ["py.typed"]},
     install_requires=[
         "pyusb>=1.2",
