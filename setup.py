@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dln2",
-    version="0.2.1",
+    version="0.2.2",
     description="Unified DLN2 driver — SPI, GPIO, I2C, ADC over a single USB connection. "
                 "Originally developed for the Pico USB I/O Board.",
     long_description=open("README.md").read(),
@@ -14,7 +14,7 @@ setup(
     author="IPM Group",
     author_email="contact@ipmgroup.dev",
     license="MIT",
-    packages=find_packages(exclude=["examples"]),
+    packages=find_packages(exclude=["examples", "i2c", "i2c.*"]),
     package_data={"dln2": ["py.typed"]},
     install_requires=[
         "pyusb>=1.2",
