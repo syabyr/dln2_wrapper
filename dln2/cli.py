@@ -283,40 +283,6 @@ def i2c_test():
 
 
 # ═══════════════════════════════════════════════════════════════
-# BME280
-# ═══════════════════════════════════════════════════════════════
-
-def bme280():
-    """Read BME280 sensor values (chip ID + measurements)."""
-    from dln2.bme280 import BME280
-
-    parser = argparse.ArgumentParser(description="Read BME280 values over DLN2 I2C")
-    parser.add_argument("--address", type=_parse_int, default=0x76, help="BME280 I2C address")
-    parser.add_argument("--pretty", action="store_true", help="Print pretty JSON")
-    args = parser.parse_args()
-
-    try:
-        with BME280(address=args.address) as sensor:
-            chip_id = sensor.check_chip_id()
-            sensor.read_calibration()
-            sensor.configure()
-            measurement = sensor.read_measurements()
-
-        payload = {
-            "address": args.address,
-            "chip_id": chip_id,
-            **measurement,
-        }
-        if args.pretty:
-            print(json.dumps(payload, indent=2, sort_keys=True))
-        else:
-            print(json.dumps(payload, sort_keys=True))
-    except RuntimeError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
-
-
-# ═══════════════════════════════════════════════════════════════
 # SPI
 # ═══════════════════════════════════════════════════════════════
 

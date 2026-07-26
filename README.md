@@ -83,10 +83,6 @@ smbus-compatible API: `write_byte()`, `read_byte_data()`,
 `read_channel(channel)`, `read_all()`, `read_volts(channel)`,  
 `set_resolution(bits)`, `enable_channel(ch)`, `disable_channel(ch)`
 
-### BME280
-`read_chip_id()`, `get_temperature()`, `get_humidity()`, `get_pressure()`,  
-`get_altitude()`, `get_all()`
-
 ## CLI Commands
 
 After installation, the following commands are available:
@@ -100,7 +96,6 @@ After installation, the following commands are available:
 | `dln2-adc-watch` | Stream one ADC channel |
 | `dln2-i2c-scan` | Scan I2C bus for devices |
 | `dln2-i2c-test` | Read/write I2C register |
-| `dln2-bme280` | Read BME280 sensor measurements |
 | `dln2-spi-test` | Send SPI JEDEC ID probe |
 | `dln2-bpw-test` | Cycle SPI bits-per-word 4..16 |
 
@@ -118,28 +113,59 @@ dln2-adc-watch --channel 0 --interval 0.5
 dln2-i2c-scan
 dln2-i2c-test --address 0x76 --register 0xD0 --read 1
 
-# BME280
-dln2-bme280 --address 0x76 --pretty
-
 # SPI
 dln2-spi-test
 dln2-bpw-test
 ```
 
-## Examples (as scripts)
+## Examples
+
+### Core examples (this repo)
+
+Basic I/O operations that exercise the wrapper itself:
 
 ```bash
 # SPI JEDEC ID read
 python3 examples/spidev_test.py
 
+# SPI bits-per-word cycle
+python3 examples/bpw_tester.py
+
 # GPIO pin toggle (default: Pico LED)
 python3 examples/gpio_toggle.py --pin 25
+
+# GPIO pin info
+python3 examples/gpio_info.py --pin 2
+
+# GPIO event watch
+python3 examples/gpio_watch.py --pin 2
 
 # I2C bus scan
 python3 examples/i2c_scan.py
 
-# ADC monitor
+# I2C register read/write
+python3 examples/i2c_test.py --address 0x76 --register 0xD0 --read 1
+
+# ADC read
 python3 examples/adc_info.py
+
+# ADC stream
+python3 examples/adc_watch.py --channel 0
+```
+
+### Device-specific examples (separate repo)
+
+Sensor test scripts live in [dln2_examples](https://github.com/syabyr/dln2_examples):
+
+```bash
+git clone https://github.com/syabyr/dln2_examples
+cd dln2_examples/i2c
+
+python3 bh1750_full_test.py      # BH1750  ambient light    @ 0x23
+python3 bme280_full_test.py      # BME280  temp/press/humid @ 0x76
+python3 bmp180_full_test.py      # BMP180  temp/pressure    @ 0x77
+python3 tsl2561_full_test.py     # TSL2561 ambient light    @ 0x39
+python3 mpu9250_full_test.py     # MPU9250 9-axis IMU       @ 0x68
 ```
 
 ## Why Unified?
@@ -176,7 +202,7 @@ To flash updated firmware:
 ## Related
 
 - [pico-usb-io-board](https://github.com/syabyr/pico-usb-io-board) — RP2040 firmware
-- [st7789 display driver](https://github.com/syabyr/dln2_wrapper) — example ST7789 + BME280 application
+- [dln2_examples](https://github.com/syabyr/dln2_examples) — sensor test scripts (BH1750, BME280, BMP180, TSL2561, MPU9250, …)
 
 ## License
 

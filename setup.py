@@ -29,7 +29,6 @@ setup(
             "dln2-adc-watch=dln2.cli:adc_watch",
             "dln2-i2c-scan=dln2.cli:i2c_scan",
             "dln2-i2c-test=dln2.cli:i2c_test",
-            "dln2-bme280=dln2.cli:bme280",
             "dln2-spi-test=dln2.cli:spi_test",
             "dln2-bpw-test=dln2.cli:bpw_test",
         ],

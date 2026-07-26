@@ -24,4 +24,3 @@ from .gpio import GPIO, \
     GPIO_EVENT_LEVEL_HIGH, GPIO_EVENT_LEVEL_LOW
 from .i2c import SMBus, i2c_msg
 from .adc import ADC
-from .bme280 import BME280
