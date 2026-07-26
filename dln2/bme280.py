@@ -38,6 +38,10 @@ class BME280:
     def close(self):
         if self._owns_bus:
             self.bus.close()
+            try:
+                self.bus._conn.close()
+            except Exception:
+                pass
 
     def __enter__(self):
         return self

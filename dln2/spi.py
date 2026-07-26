@@ -12,6 +12,9 @@ class SpiDev:
         if connection is None:
             from ._core import Dln2Connection
             connection = Dln2Connection()
+            self._owns_conn = True
+        else:
+            self._owns_conn = False
         self._conn = connection
         self.debug = False
         self._max_speed_hz = 1_000_000
@@ -78,4 +81,7 @@ class SpiDev:
         return self
 
     def __exit__(self, *a):
-        pass
+        try:
+            self._conn.close()
+        except Exception:
+            pass

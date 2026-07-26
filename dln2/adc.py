@@ -13,6 +13,9 @@ class ADC:
         if connection is None:
             from ._core import Dln2Connection
             connection = Dln2Connection()
+            self._owns_conn = True
+        else:
+            self._owns_conn = False
         self._conn = connection
         self.port = int(port)
         self.resolution_bits = int(resolution_bits)
@@ -46,7 +49,13 @@ class ADC:
 
     def enable_channel(self, channel):
         self._validate(channel)
-        self._require().adc_channel_enable(channel, self.port)
+        try:
+            self._require().adc_channel_enable(channel, self.port)
+        except RuntimeError as e:
+            # Error 165: channel already usable (firmware may not support
+            # per-channel enable, but the ADC master is already enabled).
+            if "165" not in str(e):
+                raise
 
     def disable_channel(self, channel):
         self._validate(channel)
@@ -60,7 +69,11 @@ class ADC:
         self._validate(channel)
         c = self._require()
         if enable:
-            c.adc_channel_enable(channel, self.port)
+            try:
+                c.adc_channel_enable(channel, self.port)
+            except RuntimeError as e:
+                if "165" not in str(e):
+                    raise
         return c.adc_read_channel(channel, self.port)
 
     def read_all(self):
@@ -87,3 +100,7 @@ class ADC:
 
     def __exit__(self, *a):
         self.close()
+        try:
+            self._conn.close()
+        except Exception:
+            pass

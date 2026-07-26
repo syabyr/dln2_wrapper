@@ -10,7 +10,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from dln2_i2c_wrapper import SMBus
+from dln2.i2c import SMBus
 
 
 def parse_int(value):

@@ -40,17 +40,26 @@ def main():
     )
     args = parser.parse_args()
 
-    with GPIO() as gpio:
-        gpio.enable_pin(args.pin)
-        gpio.set_direction(args.pin, GPIO.DIRECTION_OUT)
+    try:
+        with GPIO() as gpio:
+            gpio.enable_pin(args.pin)
+            gpio.set_direction(args.pin, GPIO.DIRECTION_OUT)
 
-        for index in range(args.count):
-            value = gpio.toggle(args.pin)
-            print(f"toggle {index + 1}: pin={args.pin} value={value}")
-            if index != args.count - 1:
-                time.sleep(args.interval)
+            try:
+                for index in range(args.count):
+                    value = gpio.toggle(args.pin)
+                    print(f"toggle {index + 1}: pin={args.pin} value={value}")
+                    if index != args.count - 1:
+                        time.sleep(args.interval)
+            except KeyboardInterrupt:
+                print(file=sys.stderr)
 
-        gpio.disable_pin(args.pin)
+            gpio.disable_pin(args.pin)
+    except RuntimeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    finally:
+        print("Stopped.", file=sys.stderr)
 
 
 if __name__ == "__main__":

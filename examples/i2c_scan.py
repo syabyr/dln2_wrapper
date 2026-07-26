@@ -4,13 +4,15 @@ Scan the I2C bus exposed by the DLN2 I2C wrapper.
 """
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from dln2_i2c_wrapper import SMBus
+from dln2 import Dln2Connection
+from dln2.i2c import SMBus
 
 
 def parse_int(value):
@@ -18,7 +20,7 @@ def parse_int(value):
 
 
 def is_expected_nack(exc):
-    return "result=186" in str(exc)
+    return "failed: 186" in str(exc)
 
 
 def format_table(found):
@@ -51,16 +53,23 @@ def scan_bus(start, end, read_len, register=None, debug=False):
     found = []
     errors = {}
 
-    with SMBus(1, debug=debug) as bus:
-        for addr in range(start, end + 1):
-            try:
-                probe_address(bus, addr, read_len, register=register)
-                found.append(addr)
-            except RuntimeError as exc:
-                if is_expected_nack(exc):
-                    continue
-                errors.setdefault(str(exc), 0)
-                errors[str(exc)] += 1
+    conn = Dln2Connection(debug=debug)
+    try:
+        with SMBus(conn) as bus:
+            for addr in range(start, end + 1):
+                try:
+                    probe_address(bus, addr, read_len, register=register)
+                    found.append(addr)
+                except RuntimeError as exc:
+                    if is_expected_nack(exc):
+                        continue
+                    msg = str(exc)
+                    # Normalise addresses to group identical error types
+                    key = re.sub(r'0x[0-9A-Fa-f]{2}', '0xXX', msg)
+                    errors.setdefault(key, 0)
+                    errors[key] += 1
+    finally:
+        conn.close()
 
     return found, errors
 
@@ -115,7 +124,10 @@ def main():
     if errors:
         print("\nProbe errors:")
         for message, count in sorted(errors.items()):
-            print(f"  {count}x {message}")
+            if count > 1:
+                print(f"  {count}x {message}")
+            else:
+                print(f"  {message}")
 
 
 if __name__ == "__main__":

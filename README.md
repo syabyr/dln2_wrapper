@@ -28,9 +28,10 @@ rx = spi.xfer2([0x9F, 0x00, 0x00, 0x00])  # JEDEC ID
 
 # ── GPIO ────────────────────────────────────────────────
 gpio = GPIO(conn)
-gpio.set_direction(20, "out")
-gpio.write(20, 1)                 # set pin HIGH
-val = gpio.read(20)               # read pin level
+gpio.enable_pin(25)
+gpio.set_direction(25, "out")
+gpio.write(25, 1)                 # set pin HIGH
+val = gpio.read(25)               # read pin level
 
 # ── I2C ─────────────────────────────────────────────────
 i2c = SMBus(conn)
@@ -86,7 +87,46 @@ smbus-compatible API: `write_byte()`, `read_byte_data()`,
 `read_chip_id()`, `get_temperature()`, `get_humidity()`, `get_pressure()`,  
 `get_altitude()`, `get_all()`
 
-## Examples
+## CLI Commands
+
+After installation, the following commands are available:
+
+| Command | Description |
+|---|---|
+| `dln2-gpio-info` | Read GPIO pin state (JSON output) |
+| `dln2-gpio-toggle` | Toggle a GPIO pin (default: Pico LED) |
+| `dln2-gpio-watch` | Watch GPIO pin events |
+| `dln2-adc-info` | Read all ADC channels (JSON output) |
+| `dln2-adc-watch` | Stream one ADC channel |
+| `dln2-i2c-scan` | Scan I2C bus for devices |
+| `dln2-i2c-test` | Read/write I2C register |
+| `dln2-bme280` | Read BME280 sensor measurements |
+| `dln2-spi-test` | Send SPI JEDEC ID probe |
+| `dln2-bpw-test` | Cycle SPI bits-per-word 4..16 |
+
+```bash
+# GPIO
+dln2-gpio-info --pin 2
+dln2-gpio-toggle --pin 25 --count 5 --interval 0.2
+dln2-gpio-watch --pin 2 --timeout-ms 500
+
+# ADC
+dln2-adc-info
+dln2-adc-watch --channel 0 --interval 0.5
+
+# I2C
+dln2-i2c-scan
+dln2-i2c-test --address 0x76 --register 0xD0 --read 1
+
+# BME280
+dln2-bme280 --address 0x76 --pretty
+
+# SPI
+dln2-spi-test
+dln2-bpw-test
+```
+
+## Examples (as scripts)
 
 ```bash
 # SPI JEDEC ID read

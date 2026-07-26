@@ -13,6 +13,9 @@ class GPIO:
         if connection is None:
             from ._core import Dln2Connection
             connection = Dln2Connection()
+            self._owns_conn = True
+        else:
+            self._owns_conn = False
         self._conn = connection
 
     def get_pin_count(self):
@@ -61,4 +64,7 @@ class GPIO:
         return self
 
     def __exit__(self, *a):
-        pass
+        try:
+            self._conn.close()
+        except Exception:
+            pass

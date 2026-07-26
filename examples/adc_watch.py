@@ -25,18 +25,27 @@ def main():
     parser.add_argument("--count", type=int, default=0, help="Number of samples, 0 means forever")
     args = parser.parse_args()
 
-    with ADC() as adc:
-        adc.enable_channel(args.channel)
-        remaining = args.count
-        while True:
-            raw = adc.read_channel(args.channel)
-            volts = adc.to_voltage(raw)
-            print(f"ch{args.channel}: raw={raw:4d} voltage={volts:.4f} V")
-            if remaining:
-                remaining -= 1
-                if remaining <= 0:
-                    break
-            time.sleep(args.interval)
+    try:
+        with ADC() as adc:
+            adc.enable_channel(args.channel)
+            remaining = args.count
+            try:
+                while True:
+                    raw = adc.read_channel(args.channel)
+                    volts = adc.to_voltage(raw)
+                    print(f"ch{args.channel}: raw={raw:4d} voltage={volts:.4f} V")
+                    if remaining:
+                        remaining -= 1
+                        if remaining <= 0:
+                            break
+                    time.sleep(args.interval)
+            except KeyboardInterrupt:
+                print(file=sys.stderr)
+    except RuntimeError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    finally:
+        print("Stopped.", file=sys.stderr)
 
 
 if __name__ == "__main__":

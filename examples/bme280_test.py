@@ -11,7 +11,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from dln2_i2c_wrapper import BME280
+from dln2.bme280 import BME280
 
 
 def parse_int(value):

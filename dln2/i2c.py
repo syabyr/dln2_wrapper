@@ -51,6 +51,9 @@ class SMBus:
         if connection is None:
             from ._core import Dln2Connection
             connection = Dln2Connection()
+            self._owns_conn = True
+        else:
+            self._owns_conn = False
         self._conn = connection
         self._opened = False
 
@@ -133,3 +136,7 @@ class SMBus:
 
     def __exit__(self, *a):
         self.close()
+        try:
+            self._conn.close()
+        except Exception:
+            pass

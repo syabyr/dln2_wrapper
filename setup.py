@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dln2",
-    version="0.1.0",
+    version="0.2.0",
     description="Unified DLN2 driver — SPI, GPIO, I2C, ADC over a single USB connection. "
                 "Originally developed for the Pico USB I/O Board.",
     long_description=open("README.md").read(),
@@ -20,6 +20,20 @@ setup(
         "pyusb>=1.2",
     ],
     python_requires=">=3.9",
+    entry_points={
+        "console_scripts": [
+            "dln2-gpio-info=dln2.cli:gpio_info",
+            "dln2-gpio-toggle=dln2.cli:gpio_toggle",
+            "dln2-gpio-watch=dln2.cli:gpio_watch",
+            "dln2-adc-info=dln2.cli:adc_info",
+            "dln2-adc-watch=dln2.cli:adc_watch",
+            "dln2-i2c-scan=dln2.cli:i2c_scan",
+            "dln2-i2c-test=dln2.cli:i2c_test",
+            "dln2-bme280=dln2.cli:bme280",
+            "dln2-spi-test=dln2.cli:spi_test",
+            "dln2-bpw-test=dln2.cli:bpw_test",
+        ],
+    },
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
